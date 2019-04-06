@@ -31,7 +31,7 @@ git_work_clean["en"]="working directory clean"
 git_work_clean["ca"]="La vostra branca està al dia"
 
 git_branch_ahead_of["en"]="Your branch is ahead of"
-git_branch_ahead_of["ca"]="Your branch is ahead of"
+git_branch_ahead_of["ca"]="La vostra branca està davant de"
 
 git_staged["en"]="Canvis no «staged» per a cometre"
 git_staged["ca"]="Canvis no «staged» per a cometre"
@@ -52,9 +52,7 @@ function git_color {
         
         local branch=${BASH_REMATCH[1]}
         
-        if [[ $branch == "master" && ! $git_status =~ ${git_work_clean[$lang]} ]]; then
-            echo "124"
-        elif [[ ! $git_status =~ ${git_work_clean[$lang]} ]]; then
+        if [[ ! $git_status =~ ${git_work_clean[$lang]} ]]; then
             echo "160"
         elif [[ $git_status =~ ${git_branch_ahead_of[$lang]} ]]; then
             echo "11"

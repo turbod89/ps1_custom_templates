@@ -28,25 +28,56 @@ git_on_branch["en"]="On branch"
 git_on_branch["ca"]="En la branca"
 
 git_work_clean["en"]="working directory clean"
-git_work_clean["ca"]="working directory clean"
+git_work_clean["ca"]="La vostra branca està al dia"
+
+git_branch_ahead_of["en"]="Your branch is ahead of"
+git_branch_ahead_of["ca"]="Your branch is ahead of"
+
+git_staged["en"]="Canvis no «staged» per a cometre"
+git_staged["ca"]="Canvis no «staged» per a cometre"
+
+git_to_commit["en"]="Canvis a cometre"
+git_to_commit["ca"]="Canvis a cometre"
+
+
+git_nothing_to_commit["en"]="nothing to commit"
+git_nothing_to_commit["ca"]="no hi ha res a cometre"
 
 function git_color {
   local lang="$1"
   local git_status="$(git status 2> /dev/null)"
-  local on_branch="${"git_on_branch_${lang}"}"
-  local branch=${BASH_REMATCH[1]}
+  local on_branch="${git_on_branch[$lang]} ([^${IFS}]*)"
 
-  if [[ $branch == "master" ]]; then
-    echo "34"
-  elif [[ ! $git_status =~ ${git_work_clean[$lang]} ]]; then
-    echo "160"
-  elif [[ $git_status =~ "Your branch is ahead of" ]]; then
-    echo "11"
-  elif [[ $git_status =~ "nothing to commit" ]]; then
-    echo "82"
-  else
-    echo "208"
-  fi
+  if [[ $git_status =~ $on_branch ]]; then
+        
+        local branch=${BASH_REMATCH[1]}
+        
+        if [[ $branch == "master" && ! $git_status =~ ${git_work_clean[$lang]} ]]; then
+            echo "124"
+        elif [[ ! $git_status =~ ${git_work_clean[$lang]} ]]; then
+            echo "160"
+        elif [[ $git_status =~ ${git_branch_ahead_of[$lang]} ]]; then
+            echo "11"
+        elif [[ $git_status =~ ${git_staged[$lang]} ]]; then
+            echo "208"
+        elif [[ $git_status =~ ${git_to_commit[$lang]} ]]; then
+            echo "11"
+        elif [[ $git_status =~ ${git_nothing_to_commit[$lang]} ]]; then
+            echo "82"
+        fi
+
+    elif [[ $git_status =~ $on_commit ]]; then
+        
+        local commit=${BASH_REMATCH[1]}
+        
+        if [[ ! $git_status =~ ${git_work_clean[$lang]} ]]; then
+            echo "160"
+        elif [[ $git_status =~ "Your commit is ahead of" ]]; then
+            echo "11"
+        fi
+    else
+        echo ""
+    fi
 }
 
 function git_branch {
@@ -79,7 +110,7 @@ function git_section {
   if [[ "$branch" == "" ]]; then
     echo ""
   else
-    color="160" #$(git_color $lang)
+    color=$(git_color $lang)
     echo "$(get_color 255){$(get_color $color)$branch$(get_color 255)}$(get_color)"
   fi
 }

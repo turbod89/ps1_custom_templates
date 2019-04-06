@@ -11,14 +11,14 @@ C_BG_S3=95
 
 function get_color {
   if [[ "$#" == "0" ]]; then
-    echo -e "\033[0m"
+    echo -e "\[\033[0m\]"
   elif [[ "$#" == "1" ]]; then
     local color="$1"
-    echo -e "\033[0m\033[38;5;${color}m"
+    echo -e "\[\033[0m\033[38;5;${color}m\]"
   elif [[ "$#" == "2" ]]; then
     local fg="$1"
     local bg="$2"
-    echo -e "\033[38;5;${fg}m\033[48;5;${bg}m"
+    echo -e "\[\033[38;5;${fg}m\]\[\033[48;5;${bg}m\]"
   fi
 }
 
@@ -92,16 +92,16 @@ function hour_section {
     echo "$(get_color ${C_FG_S3} ${C_BG_S3}) $d $(close_tag ${C_FG_S3} ${C_BG_S3} ${C_BG_S1})"
 }
 
-export PS1="";
-export PS1="$PS1\$(hour_section)"
-export PS1="$PS1$(user_section)"
-#export PS1="$PS1$(separator_section)"
-export PS1="$PS1$(path_section)"
-#export PS1="$PS1$(separator_section)"
-export PS1="$PS1\$(git_section)"
+function update_ps1 {
+    export PS1="";
+    export PS1="$PS1\$(hour_section)"
+    export PS1="$PS1$(user_section)"
+    #export PS1="$PS1$(separator_section)"
+    export PS1="$PS1$(path_section)"
+    #export PS1="$PS1$(separator_section)"
+    export PS1="$PS1$(git_section)"
 
-export PS1="$PS1\$(get_color)\n$ "
+    export PS1="$PS1$(get_color)\n$ "
+}
 
-
-#export PS1="\[\$(get_color 255)\]{\[\$(git_color)\]\$(git_branch)\[\$(get_color 255)\]}-(\[\$(get_color 154)\]\u\[\$(get_color)\]\[\$(get_color 255)\])-[\[\$(get_color 250)\]\w\[\$(get_color)\]\[\$(get_color 255)\]]:\[\$(get_color)\] "
-
+export PROMPT_COMMAND='update_ps1'

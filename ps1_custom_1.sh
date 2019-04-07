@@ -113,6 +113,16 @@ function git_section {
   fi
 }
 
+function venv_section {
+  if [[ "$VIRTUAL_ENV" == "" ]]; then
+    echo ""
+    return
+  else
+    local name=`basename "$VIRTUAL_ENV"`
+    echo "$(get_color 255)($(get_color 208)$name$(get_color 255))$(get_color) "
+  fi
+}
+
 function user_section {
   echo "$(get_color 255)($(get_color 154)\\u$(get_color)$(get_color 255))$(get_color)"
 }
@@ -131,6 +141,7 @@ function end_section {
 
 function update_ps1 {
   ps1_aux="";
+  ps1_aux="$ps1_aux$(venv_section)"
   ps1_aux="$ps1_aux$(user_section)"
   ps1_aux="$ps1_aux$(separator_section)"
   ps1_aux="$ps1_aux$(path_section)"

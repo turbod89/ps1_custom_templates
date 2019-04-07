@@ -145,7 +145,7 @@ function update_ps1 {
   ps1_aux="$ps1_aux$(user_section)"
   ps1_aux="$ps1_aux$(separator_section)"
   ps1_aux="$ps1_aux$(path_section)"
-  ps1_aux="$ps1_aux$(separator_section)"
+  #ps1_aux="$ps1_aux$(separator_section)"
   ps1_aux="$ps1_aux$(git_section ca)"
   ps1_aux="$ps1_aux$(end_section)"
 

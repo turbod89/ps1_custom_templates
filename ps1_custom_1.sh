@@ -52,16 +52,14 @@ function git_color {
         
         local branch=${BASH_REMATCH[1]}
         
-        if [[ ! $git_status =~ ${git_work_clean[$lang]} ]]; then
-            echo "160"
-        elif [[ $git_status =~ ${git_branch_ahead_of[$lang]} ]]; then
-            echo "11"
+        if [[ $git_status =~ ${git_branch_ahead_of[$lang]} ]]; then
+            echo "11" # light orange = yellow
         elif [[ $git_status =~ ${git_staged[$lang]} ]]; then
-            echo "208"
+            echo "160" # red
         elif [[ $git_status =~ ${git_to_commit[$lang]} ]]; then
-            echo "11"
+            echo "208" # dark orange
         elif [[ $git_status =~ ${git_nothing_to_commit[$lang]} ]]; then
-            echo "82"
+            echo "82" # green
         fi
 
     elif [[ $git_status =~ $on_commit ]]; then
@@ -109,7 +107,7 @@ function git_section {
     echo ""
   else
     color=$(git_color $lang)
-    echo "$(get_color 255){$(get_color $color)$branch$(get_color 255)}$(get_color)"
+    echo "$(get_color 255)-{$(get_color $color)$branch$(get_color 255)}$(get_color)"
   fi
 }
 

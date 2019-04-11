@@ -122,7 +122,7 @@ function venv_section {
 }
 
 function user_section {
-	echo "$(get_color 255)($(get_color 154)\\u$(get_color 9)@$(get_color 27)\\h$(get_color 255))$(get_color)"
+	echo "$(get_color 255)($(get_color 154)\\u$(get_color 9)@$(get_color 154)\\h$(get_color 255))$(get_color)"
 }
 
 function path_section {

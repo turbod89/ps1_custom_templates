@@ -1,14 +1,5 @@
 #!/bin/bash
 
-C_FG_S1=94
-C_FG_S2=214
-C_FG_S3=0
-
-C_BG_S1=214
-C_BG_S2=33
-C_BG_S3=95
-
-
 function get_color {
   if [[ "$#" == "0" ]]; then
     echo -e "\[\033[0m\]"
@@ -20,6 +11,18 @@ function get_color {
     local bg="$2"
     echo -e "\[\033[38;5;${fg}m\]\[\033[48;5;${bg}m\]"
   fi
+}
+
+function separator_section {
+  echo "$(get_color 255)]-[$(get_color)"
+}
+
+function open_separator_section {
+  echo "$(get_color 255)[$(get_color)"
+}
+
+function close_separator_section {
+  echo "$(get_color 255)]$(get_color)"
 }
 
 function open_tag {
@@ -41,67 +44,137 @@ function close_tag {
     fi
 }
 
-function git_section {
-    local git_status="$(git status 2> /dev/null)"
-    local on_branch="On branch ([^${IFS}]*)"
-    local on_commit="HEAD detached at ([^${IFS}]*)"
 
-    if [[ $git_status =~ $on_branch ]]; then
+git_on_branch["en"]="On branch"
+git_on_branch["ca"]="En la branca"
+
+git_work_clean["en"]="working directory clean"
+git_work_clean["ca"]="La vostra branca està al dia"
+
+git_branch_ahead_of["en"]="Your branch is ahead of"
+git_branch_ahead_of["ca"]="La vostra branca està davant de"
+
+git_staged["en"]="Canvis no «staged» per a cometre"
+git_staged["ca"]="Canvis no «staged» per a cometre"
+
+git_to_commit["en"]="Canvis a cometre"
+git_to_commit["ca"]="Canvis a cometre"
+
+
+git_nothing_to_commit["en"]="nothing to commit"
+git_nothing_to_commit["ca"]="no hi ha res a cometre"
+
+function git_color {
+  local lang="$1"
+  local git_status="$(git status 2> /dev/null)"
+  local on_branch="${git_on_branch[$lang]} ([^${IFS}]*)"
+
+  if [[ $git_status =~ $on_branch ]]; then
         
         local branch=${BASH_REMATCH[1]}
         
-        if [[ $branch == "master" && ! $git_status =~ "working directory clean" ]]; then
-            echo " $(open_tag 250 124)${branch}$(close_tag 255 124)"
-        elif [[ ! $git_status =~ "working directory clean" ]]; then
-            echo " $(open_tag 0 160)${branch}$(close_tag 255 160)"
-        elif [[ $git_status =~ "Your branch is ahead of" ]]; then
-            echo " $(open_tag 0 11)${branch}$(close_tag 255 11)"
-        elif [[ $git_status =~ "nothing to commit" ]]; then
-            echo " $(open_tag 0 82)${branch}$(close_tag 255 82)"
+        if [[ $git_status =~ ${git_branch_ahead_of[$lang]} ]]; then
+            echo "11" # light orange = yellow
+        elif [[ $git_status =~ ${git_staged[$lang]} ]]; then
+            echo "160" # red
+        elif [[ $git_status =~ ${git_to_commit[$lang]} ]]; then
+            echo "208" # dark orange
+        elif [[ $git_status =~ ${git_nothing_to_commit[$lang]} ]]; then
+            echo "82" # green
         fi
 
     elif [[ $git_status =~ $on_commit ]]; then
         
         local commit=${BASH_REMATCH[1]}
         
-        if [[ ! $git_status =~ "working directory clean" ]]; then
-            echo " $(open_tag 0 160)$commit$(close_tag 255 160)"
+        if [[ ! $git_status =~ ${git_work_clean[$lang]} ]]; then
+            echo "160"
         elif [[ $git_status =~ "Your commit is ahead of" ]]; then
-            echo " $(open_tag 0 11)$commit$(close_tag 255 11)"
+            echo "11"
         fi
     else
         echo ""
     fi
 }
 
+function git_branch {
+  local lang="$1"
+  local git_status="$(git status 2> /dev/null)"
+  local on_branch="${git_on_branch[$lang]} ([^${IFS}]*)"
+  local on_commit="HEAD detached at ([^${IFS}]*)"
+
+  if [[ $git_status =~ $on_branch ]]; then
+    local branch=${BASH_REMATCH[1]}
+    echo "$branch"
+  elif [[ $git_status =~ $on_commit ]]; then
+    local commit=${BASH_REMATCH[1]}
+    echo "$commit"
+  else
+	  echo ""
+    # echo $(cat /proc/stat | grep -i processes)
+  fi
+}
+
+function parse_git_branch {
+  a=$(git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ (\1)/')
+	echo "$a"
+}
+
+function git_section {
+  local lang="$1"
+  branch="$(git_branch $lang)"
+
+  if [[ "$branch" == "" ]]; then
+    echo ""
+  else
+    color=$(git_color $lang)
+    echo "$(separator_section)$(get_color $color)$branch$(get_color)"
+  fi
+}
+
+
+function venv_section {
+  if [[ "$VIRTUAL_ENV" == "" ]]; then
+    echo ""
+    return
+  else
+    local name=`basename "$VIRTUAL_ENV"`
+    echo "$(separator_section)$(get_color 208)$name$(get_color)"
+  fi
+}
 
 function user_section {
-  echo "$(get_color ${C_FG_S1} ${C_BG_S1}) \\u $(close_tag ${C_FG_S1} ${C_BG_S1} ${C_BG_S2})"
+  echo "$(get_color 83)\\u$(get_color)"
+}
+
+function host_section {
+  echo "$(get_color 214)\\h$(get_color)"
 }
 
 function path_section {
-  echo "$(get_color ${C_FG_S2} ${C_BG_S2}) \\w $(close_tag ${C_FG_S2} ${C_BG_S2})"
-}
-
-function separator_section {
-  echo "$(get_color 255)-$(get_color)"
+  echo "$(get_color 69)\\w$(get_color)"
 }
 
 function hour_section {
     local d=$(date +"%T")
-    echo "$(get_color ${C_FG_S3} ${C_BG_S3}) $d $(close_tag ${C_FG_S3} ${C_BG_S3} ${C_BG_S1})"
+    echo "$(get_color 220)$d$(get_color)"
 }
 
 function update_ps1 {
-    export PS1="";
-    export PS1="$PS1\$(hour_section)"
-    export PS1="$PS1$(user_section)"
-    #export PS1="$PS1$(separator_section)"
-    export PS1="$PS1$(path_section)"
-    #export PS1="$PS1$(separator_section)"
-    export PS1="$PS1$(git_section)"
-
-    export PS1="$PS1$(get_color)\n$ "
+    ps1_aux="";
+    ps1_aux="$ps1_aux$(open_separator_section)"
+    ps1_aux="$ps1_aux$(hour_section)"
+    ps1_aux="$ps1_aux$(separator_section)"
+    ps1_aux="$ps1_aux$(user_section)"
+    ps1_aux="$ps1_aux$(separator_section)"
+    ps1_aux="$ps1_aux$(host_section)"
+    ps1_aux="$ps1_aux$(separator_section)"
+    ps1_aux="$ps1_aux$(path_section)"
+    ps1_aux="$ps1_aux$(venv_section)"
+    ps1_aux="$ps1_aux$(git_section ca)"
+    ps1_aux="$ps1_aux$(close_separator_section)"
+    ps1_aux="$ps1_aux$(get_color)\n$ "
+    export PS1="$ps1_aux"
 }
 
 export PROMPT_COMMAND='update_ps1'

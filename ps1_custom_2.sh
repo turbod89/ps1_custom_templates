@@ -44,25 +44,35 @@ function close_tag {
     fi
 }
 
+declare -A git_on_branch=(
+  ["en"]="On branch"
+  ["ca"]="En la branca"
+)
 
-git_on_branch["en"]="On branch"
-git_on_branch["ca"]="En la branca"
+declare -A git_work_clean=(
+  ["en"]="working directory clean"
+  ["ca"]="La vostra branca està al dia"
+)
 
-git_work_clean["en"]="working directory clean"
-git_work_clean["ca"]="La vostra branca està al dia"
+declare -A git_branch_ahead_of=(
+  ["en"]="Your branch is ahead of"
+  ["ca"]="La vostra branca està davant de"
+)
 
-git_branch_ahead_of["en"]="Your branch is ahead of"
-git_branch_ahead_of["ca"]="La vostra branca està davant de"
+declare -A  git_staged=(
+  ["en"]="Changes not staged for commit"
+  ["ca"]="Canvis no «staged» per a cometre"
+)
 
-git_staged["en"]="Canvis no «staged» per a cometre"
-git_staged["ca"]="Canvis no «staged» per a cometre"
+declare -A git_to_commit=(
+  ["en"]="Changes to be committed"
+  ["ca"]="Canvis a cometre"
+)
 
-git_to_commit["en"]="Canvis a cometre"
-git_to_commit["ca"]="Canvis a cometre"
-
-
-git_nothing_to_commit["en"]="nothing to commit"
-git_nothing_to_commit["ca"]="no hi ha res a cometre"
+declare -A git_nothing_to_commit=(
+  ["en"]="nothing to commit"
+  ["ca"]="no hi ha res a cometre"
+)
 
 function git_color {
   local lang="$1"
@@ -111,7 +121,6 @@ function git_branch {
     echo "$commit"
   else
 	  echo ""
-    # echo $(cat /proc/stat | grep -i processes)
   fi
 }
 

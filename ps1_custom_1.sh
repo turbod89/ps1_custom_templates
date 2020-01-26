@@ -149,13 +149,14 @@ function end_section {
 }
 
 function update_ps1 {
+  lang=$(locale 2> /dev/null | egrep LANG= | sed -r s/LANG=\([a-z0-9]*\)_.*/\\1/g)
   ps1_aux="";
   ps1_aux="$ps1_aux$(venv_section)"
   ps1_aux="$ps1_aux$(user_section)"
   ps1_aux="$ps1_aux$(separator_section)"
   ps1_aux="$ps1_aux$(path_section)"
   #ps1_aux="$ps1_aux$(separator_section)"
-  ps1_aux="$ps1_aux$(git_section ca)"
+  ps1_aux="$ps1_aux$(git_section $lang)"
   ps1_aux="$ps1_aux$(end_section)"
 
   export PS1="$ps1_aux"

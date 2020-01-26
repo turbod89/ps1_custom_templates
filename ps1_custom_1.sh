@@ -1,114 +1,8 @@
 #!/bin/bash
 
-COLOR_RED="\033[0;31m"
-COLOR_YELLOW="\033[0;33m"
-COLOR_GREEN="\033[0;32m"
-COLOR_OCHRE="\033[38;5;95m"
-COLOR_BLUE="\033[0;34m"
-COLOR_WHITE="\033[0;37m"
-COLOR_RESET="\033[0m"
-
-COLOR_RED_BLINK="\033[5;31m"
-COLOR_RED_INVERTED="\033[7;31m"
-
-function get_color {
-  if [[ "$#" == "0" ]]; then
-    echo -e "\[\033[0m\]"
-  elif [[ "$#" == "1" ]]; then
-    local color="$1"
-    echo -e "\[\033[0m\033[38;5;${color}m\]"
-  elif [[ "$#" == "2" ]]; then
-    local fg="$1"
-    local bg="$2"
-    echo -e "\[\033[38;5;${fg}m\]\[\033[48;5;${bg}m\]"
-  fi
-}
-
-declare -A git_on_branch=(
-  ["en"]="On branch"
-  ["ca"]="En la branca"
-)
-
-declare -A git_work_clean=(
-  ["en"]="working directory clean"
-  ["ca"]="La vostra branca està al dia"
-)
-
-declare -A git_branch_ahead_of=(
-  ["en"]="Your branch is ahead of"
-  ["ca"]="La vostra branca està davant de"
-)
-
-declare -A  git_staged=(
-  ["en"]="Changes not staged for commit"
-  ["ca"]="Canvis no «staged» per a cometre"
-)
-
-declare -A git_to_commit=(
-  ["en"]="Changes to be committed"
-  ["ca"]="Canvis a cometre"
-)
-
-declare -A git_nothing_to_commit=(
-  ["en"]="nothing to commit"
-  ["ca"]="no hi ha res a cometre"
-)
-
-function git_color {
-  local lang="$1"
-  local git_status="$(git status 2> /dev/null)"
-  local on_branch="${git_on_branch[$lang]} ([^${IFS}]*)"
-
-  if [[ $git_status =~ $on_branch ]]; then
-        
-        local branch=${BASH_REMATCH[1]}
-        
-        if [[ $git_status =~ ${git_branch_ahead_of[$lang]} ]]; then
-            echo "11" # light orange = yellow
-        elif [[ $git_status =~ ${git_staged[$lang]} ]]; then
-            echo "160" # red
-        elif [[ $git_status =~ ${git_to_commit[$lang]} ]]; then
-            echo "208" # dark orange
-        elif [[ $git_status =~ ${git_nothing_to_commit[$lang]} ]]; then
-            echo "82" # green
-        fi
-
-    elif [[ $git_status =~ $on_commit ]]; then
-        
-        local commit=${BASH_REMATCH[1]}
-        
-        if [[ ! $git_status =~ ${git_work_clean[$lang]} ]]; then
-            echo "160"
-        elif [[ $git_status =~ "Your commit is ahead of" ]]; then
-            echo "11"
-        fi
-    else
-        echo ""
-    fi
-}
-
-function git_branch {
-  local lang="$1"
-  local git_status="$(git status 2> /dev/null)"
-  local on_branch="${git_on_branch[$lang]} ([^${IFS}]*)"
-  local on_commit="HEAD detached at ([^${IFS}]*)"
-
-  if [[ $git_status =~ $on_branch ]]; then
-    local branch=${BASH_REMATCH[1]}
-    echo "$branch"
-  elif [[ $git_status =~ $on_commit ]]; then
-    local commit=${BASH_REMATCH[1]}
-    echo "$commit"
-  else
-	  echo ""
-    # echo $(cat /proc/stat | grep -i processes)
-  fi
-}
-
-function parse_git_branch {
-  a=$(git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ (\1)/')
-	echo "$a"
-}
+actual_dir="$(dirname "${BASH_SOURCE}")"
+source "$actual_dir/color_tools.sh"
+source "$actual_dir/git_tools.sh"
 
 function git_section {
   local lang="$1"
@@ -149,8 +43,8 @@ function end_section {
 }
 
 function update_ps1 {
-  lang=$(locale 2> /dev/null | egrep LANG= | sed -r s/LANG=\([a-z0-9]*\)_.*/\\1/g)
-  ps1_aux="";
+  local lang=$(locale 2> /dev/null | egrep LANG= | sed -r s/LANG=\([a-z0-9]*\)_.*/\\1/g)
+  local ps1_aux="";
   ps1_aux="$ps1_aux$(venv_section)"
   ps1_aux="$ps1_aux$(user_section)"
   ps1_aux="$ps1_aux$(separator_section)"

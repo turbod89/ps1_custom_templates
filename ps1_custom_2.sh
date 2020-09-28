@@ -9,6 +9,10 @@ function separator_section {
   echo "$(get_color 255)]-[$(get_color)"
 }
 
+function separator_subsection {
+  echo "$(get_color 255))($(get_color)"
+}
+
 function open_separator_section {
   echo "$(get_color 255)[$(get_color)"
 }
@@ -19,13 +23,55 @@ function close_separator_section {
 
 function git_section {
   local lang="$1"
-  branch="$(git_branch $lang)"
+  local status=$(git_status)
 
-  if [[ "$branch" == "" ]]; then
+  if [[ "$status" == "" ]]; then
     echo ""
   else
-    color=$(git_color $lang)
-    echo "$(separator_section)$(get_color $color)$branch$(get_color)"
+    local color=$(git_color $status)
+    local local_branch=$(echo $status | cut -d " " -f1)
+    local remote_branch=$(echo $status | cut -d " " -f2)
+    local new_files=$(echo $status | cut -d " " -f3)
+    local conflicted_files=$(echo $status | cut -d " " -f4)
+    local changed_files=$(echo $status | cut -d " " -f5)
+    local staged_files=$(echo $status | cut -d " " -f6)
+    local ahead=$(echo $status | cut -d " " -f7)
+    local ahead_num=$(echo $status | cut -d " " -f8)
+    local behind=$(echo $status | cut -d " " -f9)
+    local behind_num=$(echo $status | cut -d " " -f10)
+
+    local display="$(get_color $color)$local_branch"
+    local subsection=""
+
+    if [[ $conflicted_files -gt 0 ]]; then
+      local color="$(git_color "conflicts")"
+      subsection="$subsection$(get_color $color)${conflicted_files}!"
+    fi
+    if [[ $new_files -gt 0 ]]; then
+      local color="$(git_color "new")"
+      subsection="$subsection$(get_color $color)${new_files}+"
+    fi
+    if [[ $changed_files -gt 0 ]]; then
+      local color="$(git_color "changed")"
+      subsection="$subsection$(get_color $color)${changed_files}C"
+    fi
+    if [[ $staged_files -gt 0 ]]; then
+      local color="$(git_color "staged")"
+      subsection="$subsection$(get_color $color)${staged_files}S"
+    fi
+    if [[ $ahead != "" ]]; then
+      local color="$(git_color "ahead")"
+      subsection="$subsection$(get_color $color)${ahead_num}A"
+    fi
+    if [[ $behind != "" ]]; then
+      local color="$(git_color "behind")"
+      subsection="$subsection$(get_color $color)${behind_num}B"
+    fi
+
+    if [[ $subsection != "" ]]; then
+      display="$display$(separator_subsection)$subsection"
+    fi
+    echo "$(separator_section)${display}$(get_color)"
   fi
 }
 

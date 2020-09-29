@@ -93,6 +93,10 @@ function host_section {
   echo "$(get_color 214)\\h$(get_color)"
 }
 
+function user_host_section {
+  echo "$(get_color 83)\\u$(separator_subsection)$(get_color 214)\\h$(get_color)"
+}
+
 function path_section {
   echo "$(get_color 69)\\w$(get_color)"
 }
@@ -107,11 +111,12 @@ function update_ps1 {
 
     local ps1_aux="";
     ps1_aux="$ps1_aux$(open_separator_section)"
-    ps1_aux="$ps1_aux$(hour_section)"
-    ps1_aux="$ps1_aux$(separator_section)"
-    ps1_aux="$ps1_aux$(user_section)"
-    ps1_aux="$ps1_aux$(separator_section)"
-    ps1_aux="$ps1_aux$(host_section)"
+    #ps1_aux="$ps1_aux$(hour_section)"
+    #ps1_aux="$ps1_aux$(separator_section)"
+    ps1_aux="$ps1_aux$(user_host_section)"
+    #ps1_aux="$ps1_aux$(user_section)"
+    #ps1_aux="$ps1_aux$(separator_subsection)"
+    #ps1_aux="$ps1_aux$(host_section)"
     ps1_aux="$ps1_aux$(separator_section)"
     ps1_aux="$ps1_aux$(path_section)"
     ps1_aux="$ps1_aux$(git_section $lang)"

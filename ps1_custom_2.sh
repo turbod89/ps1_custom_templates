@@ -29,19 +29,23 @@ function git_section {
     echo ""
   else
     local color=$(git_color $status)
-    local local_branch=$(echo $status | cut -d " " -f1)
-    local remote_branch=$(echo $status | cut -d " " -f2)
-    local new_files=$(echo $status | cut -d " " -f3)
-    local conflicted_files=$(echo $status | cut -d " " -f4)
-    local changed_files=$(echo $status | cut -d " " -f5)
-    local staged_files=$(echo $status | cut -d " " -f6)
-    local ahead=$(echo $status | cut -d " " -f7)
-    local ahead_num=$(echo $status | cut -d " " -f8)
-    local behind=$(echo $status | cut -d " " -f9)
-    local behind_num=$(echo $status | cut -d " " -f10)
+    local local_branch=$(echo "$status" | cut -d " " -f1)
+    local remote_branch=$(echo "$status" | cut -d " " -f2)
+    local new_files=$(echo "$status" | cut -d " " -f3)
+    local conflicted_files=$(echo "$status" | cut -d " " -f4)
+    local changed_files=$(echo "$status" | cut -d " " -f5)
+    local staged_files=$(echo "$status" | cut -d " " -f6)
+    local ahead=$(echo "$status" | cut -d " " -f7)
+    local ahead_num=$(echo "$status" | cut -d " " -f8)
+    local behind=$(echo "$status" | cut -d " " -f9)
+    local behind_num=$(echo "$status" | cut -d " " -f10)
 
     local display="$(get_color $color)$local_branch"
     local subsection=""
+
+    #echo "local: $local_branch"
+    #echo "remote: $remote_branch"
+    #echo "files: $new_files $conflicted_files $changed_files $staged_files"
 
     if [[ $conflicted_files -gt 0 ]]; then
       local color="$(git_color "conflicts")"

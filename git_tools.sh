@@ -111,23 +111,29 @@ function git_color {
     else
       echo "82" # green
     fi
-  elif [[ "$#" -ge 6 ]]; then
-  # local local_branch=$(echo $status | cut -d " " -f1)
-  # local remote_branch=$(echo $status | cut -d " " -f2)
-  # local new_files=$(echo $status | cut -d " " -f3)
-  # local conflicted_files=$(echo $status | cut -d " " -f4)
-  # local changed_files=$(echo $status | cut -d " " -f5)
-  # local staged_files=$(echo $status | cut -d " " -f6)
-  # local ahead=$(echo $status | cut -d " " -f7)
-  # local ahead_num=$(echo $status | cut -d " " -f8)
-  # local behind=$(echo $status | cut -d " " -f9)
-  # local behind_num=$(echo $status | cut -d " " -f10)
-    local local_branch="$1"
-    local remote_branch="$2"
-    local new_files="$3"
-    local conflicted_files="$4"
-    local changed_files="$5"
-    local staged_files="$6"
+  elif [[ "$#" -ge 5 ]]; then
+    local i=1
+    local local_branch="${!i}"
+    i=$((i+1))
+    local remote_branch="${!i}"
+    i=$((i+1))
+    if [[ "$remote_branch" =~ ^[0-9]+$ ]]; then
+      # there are no remote_branch
+      remote_branch=""
+      i=$((i-1))
+    fi
+    local new_files="${!i}"
+    i=$((i+1))
+    local conflicted_files="${!i}"
+    i=$((i+1))
+    local changed_files="${!i}"
+    i=$((i+1))
+    local staged_files="${!i}"
+    i=$((i+1))
+
+    #echo "local: $local_branch"
+    #echo "remote: $remote_branch"
+    #echo "files: $new_files $conflicted_files $changed_files $staged_files"
 
     if [[ $conflicted_files -gt 0 ]]; then
       echo "$(git_color "conflicts")"

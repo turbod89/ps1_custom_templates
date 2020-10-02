@@ -102,7 +102,21 @@ function user_host_section {
 }
 
 function path_section {
-  echo "$(get_color 69)\\w$(get_color)"
+  #echo "$(get_color 69)\\w$(get_color)"
+  local path=$(dirs);
+  local max_path_length=16
+  local complete_path_length="${#path}"
+  local parsed_path=$(basename "$path");
+  while [[ "$path" =~ .*\/.+ ]]; do
+    path=$(dirname "$path");
+    local path_segment="${path##*/}";
+    if [[ $complete_path_length -gt $max_path_length ]]; then
+      path_segment="$(echo "$path_segment" | sed -E 's/(..).*/\1/g')";
+    fi
+    parsed_path="$(get_color 69)$path_segment$(get_color 255)/$(get_color 69)$parsed_path";
+  done;
+  echo "$parsed_path";
+
 }
 
 function hour_section {
